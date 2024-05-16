@@ -1,25 +1,27 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const path = require('path');
-const usersRouter = require('./routes/users');
-const gamesRouter = require('./routes/games');
-const categoriesRouter = require('./routes/categories');
-
+const bodyParser = require('body-parser');
+const apiRouter = require('./routes/apiRoutes');
 const connectToDatabase = require('./database/connect');
-const cors = require('./middlewares/cors');
+const customCors = require('./middlewares/cors');
+const cookieParser = require("cookie-parser");
+const pagesRouter = require("./routes/pages");
 
 const app = express();
 const PORT = 3005;
 
 connectToDatabase();
 
+app.use(express.static(path.join(__dirname, 'public')))
 app.use(
-  cors, 
-  bodyParser.json(),
-  express.static(path.join(__dirname, 'public')),
-  usersRouter, 
-  gamesRouter, 
-  categoriesRouter
+    customCors,
+    cookieParser(),
+    bodyParser.json(),
+    pagesRouter,
+    apiRouter,
+    express.static(path.join(__dirname, 'public'))
 );
 
-app.listen(PORT); 
+app.listen(PORT, () => {
+    console.log(`App listening on port ${PORT}`)
+})
